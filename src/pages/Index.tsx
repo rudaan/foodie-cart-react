@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ShoppingCart, Plus, Minus, Star, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -5,6 +6,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useMenuItems, MenuItem } from '@/hooks/useMenuItems';
 import { useOrders } from '@/hooks/useOrders';
+import RecommendedItems from '@/components/RecommendedItems';
 
 interface CartItem extends MenuItem {
   quantity: number;
@@ -193,7 +195,13 @@ const Index = () => {
               <h3 className="text-2xl font-bold mb-6">Your Order</h3>
               
               {cartItems.length === 0 ? (
-                <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+                <div>
+                  <p className="text-gray-500 text-center py-8">Your cart is empty</p>
+                  <RecommendedItems 
+                    menuItems={menuItems} 
+                    onAddToCart={addToCart}
+                  />
+                </div>
               ) : (
                 <>
                   <div className="space-y-4 mb-6">
@@ -233,7 +241,12 @@ const Index = () => {
                     ))}
                   </div>
 
-                  <div className="border-t pt-6">
+                  <RecommendedItems 
+                    menuItems={menuItems} 
+                    onAddToCart={addToCart}
+                  />
+
+                  <div className="border-t pt-6 mt-6">
                     <div className="flex justify-between items-center mb-4">
                       <span className="text-xl font-semibold">Total:</span>
                       <span className="text-2xl font-bold text-orange-600">

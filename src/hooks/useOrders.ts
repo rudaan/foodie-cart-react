@@ -28,15 +28,13 @@ export const useOrders = () => {
       
       const { data, error } = await supabase
         .from('orders')
-        .insert([
-          {
-            customer_email: orderData.customer_email,
-            customer_phone: orderData.customer_phone,
-            items: orderData.items,
-            total_amount: orderData.total_amount,
-            status: 'pending'
-          }
-        ])
+        .insert({
+          customer_email: orderData.customer_email,
+          customer_phone: orderData.customer_phone,
+          items: orderData.items as any, // Cast to satisfy Json type
+          total_amount: orderData.total_amount,
+          status: 'pending'
+        })
         .select()
         .single();
 
