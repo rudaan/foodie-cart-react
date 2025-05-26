@@ -1,19 +1,10 @@
-
 import React, { useState } from 'react';
-import { ShoppingCart, Plus, Minus, Star } from 'lucide-react';
+import { ShoppingCart, Plus, Minus, Star, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-
-interface MenuItem {
-  id: string;
-  name: string;
-  description: string;
-  price: number;
-  image: string;
-  rating: number;
-  category: string;
-}
+import { useMenuItems, MenuItem } from '@/hooks/useMenuItems';
+import { useOrders } from '@/hooks/useOrders';
 
 interface CartItem extends MenuItem {
   quantity: number;
@@ -22,64 +13,8 @@ interface CartItem extends MenuItem {
 const Index = () => {
   const [cartItems, setCartItems] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
-
-  // Mock menu data (would normally come from Firebase)
-  const menuItems: MenuItem[] = [
-    {
-      id: '1',
-      name: 'Classic Margherita Pizza',
-      description: 'Fresh tomatoes, mozzarella cheese, basil leaves, olive oil',
-      price: 14.99,
-      image: 'https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=400&h=300&fit=crop',
-      rating: 4.8,
-      category: 'Pizza'
-    },
-    {
-      id: '2',
-      name: 'Gourmet Burger',
-      description: 'Angus beef patty, lettuce, tomato, onion, special sauce',
-      price: 12.99,
-      image: 'https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=400&h=300&fit=crop',
-      rating: 4.7,
-      category: 'Burgers'
-    },
-    {
-      id: '3',
-      name: 'Caesar Salad',
-      description: 'Crisp romaine lettuce, parmesan cheese, croutons, caesar dressing',
-      price: 9.99,
-      image: 'https://images.unsplash.com/photo-1551248429-40975aa4de74?w=400&h=300&fit=crop',
-      rating: 4.5,
-      category: 'Salads'
-    },
-    {
-      id: '4',
-      name: 'Chicken Teriyaki',
-      description: 'Grilled chicken breast with teriyaki sauce, steamed rice, vegetables',
-      price: 16.99,
-      image: 'https://images.unsplash.com/photo-1588347818121-d8553568996f?w=400&h=300&fit=crop',
-      rating: 4.9,
-      category: 'Asian'
-    },
-    {
-      id: '5',
-      name: 'Chocolate Lava Cake',
-      description: 'Warm chocolate cake with molten center, vanilla ice cream',
-      price: 7.99,
-      image: 'https://images.unsplash.com/photo-1624353365286-3f8d62daad51?w=400&h=300&fit=crop',
-      rating: 4.6,
-      category: 'Desserts'
-    },
-    {
-      id: '6',
-      name: 'Fish Tacos',
-      description: 'Grilled fish, cabbage slaw, pico de gallo, lime crema',
-      price: 13.99,
-      image: 'https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=400&h=300&fit=crop',
-      rating: 4.4,
-      category: 'Mexican'
-    }
-  ];
+  const { menuItems, loading, error } = useMenuItems();
+  const { submitOrder, submitting } = useOrders();
 
   const addToCart = (item: MenuItem) => {
     setCartItems(prev => {
@@ -113,6 +48,29 @@ const Index = () => {
 
   const getTotalItems = () => {
     return cartItems.reduce((total, item) => total + item.quantity, 0);
+  };
+
+  const handleCheckout = async () => {
+    if (cartItems.length === 0) return;
+
+    try {
+      await submitOrder({
+        items: cartItems.map(item => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          image: item.image
+        })),
+        total_amount: getTotalPrice()
+      });
+      
+      // Clear cart after successful order
+      setCartItems([]);
+      setIsCartOpen(false);
+    } catch (error) {
+      console.error('Order submission failed:', error);
+    }
   };
 
   return (
@@ -167,46 +125,63 @@ const Index = () => {
               <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">
                 Our Menu
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {menuItems.map(item => (
-                  <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                    <div className="relative">
-                      <img
-                        src={item.image}
-                        alt={item.name}
-                        className="w-full h-48 object-cover"
-                      />
-                      <Badge className="absolute top-2 left-2 bg-orange-500">
-                        {item.category}
-                      </Badge>
-                    </div>
-                    <CardContent className="p-6">
-                      <div className="flex items-center mb-2">
-                        <h4 className="text-xl font-semibold text-gray-900 flex-1">
-                          {item.name}
-                        </h4>
-                        <div className="flex items-center">
-                          <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                          <span className="text-sm text-gray-600 ml-1">{item.rating}</span>
+              
+              {loading ? (
+                <div className="flex justify-center items-center py-12">
+                  <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
+                  <span className="ml-2 text-gray-600">Loading menu items...</span>
+                </div>
+              ) : error ? (
+                <div className="text-center py-12">
+                  <p className="text-red-600 mb-4">Error loading menu: {error}</p>
+                  <Button onClick={() => window.location.reload()}>Retry</Button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {menuItems.map(item => (
+                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                      <div className="relative">
+                        <img
+                          src={item.image}
+                          alt={item.name}
+                          className="w-full h-48 object-cover"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop';
+                          }}
+                        />
+                        <Badge className="absolute top-2 left-2 bg-orange-500">
+                          {item.category}
+                        </Badge>
+                      </div>
+                      <CardContent className="p-6">
+                        <div className="flex items-center mb-2">
+                          <h4 className="text-xl font-semibold text-gray-900 flex-1">
+                            {item.name}
+                          </h4>
+                          <div className="flex items-center">
+                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                            <span className="text-sm text-gray-600 ml-1">{item.rating}</span>
+                          </div>
                         </div>
-                      </div>
-                      <p className="text-gray-600 mb-4">{item.description}</p>
-                      <div className="flex items-center justify-between">
-                        <span className="text-2xl font-bold text-orange-600">
-                          ${item.price.toFixed(2)}
-                        </span>
-                        <Button
-                          onClick={() => addToCart(item)}
-                          className="bg-orange-600 hover:bg-orange-700"
-                        >
-                          <Plus className="w-4 h-4 mr-2" />
-                          Add to Cart
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
+                        <p className="text-gray-600 mb-4">{item.description}</p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-2xl font-bold text-orange-600">
+                            ${item.price.toFixed(2)}
+                          </span>
+                          <Button
+                            onClick={() => addToCart(item)}
+                            className="bg-orange-600 hover:bg-orange-700"
+                          >
+                            <Plus className="w-4 h-4 mr-2" />
+                            Add to Cart
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           </section>
         </main>
@@ -228,6 +203,10 @@ const Index = () => {
                           src={item.image}
                           alt={item.name}
                           className="w-16 h-16 object-cover rounded"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=64&h=64&fit=crop';
+                          }}
                         />
                         <div className="flex-1">
                           <h4 className="font-semibold">{item.name}</h4>
@@ -261,8 +240,19 @@ const Index = () => {
                         ${getTotalPrice().toFixed(2)}
                       </span>
                     </div>
-                    <Button className="w-full bg-orange-600 hover:bg-orange-700 text-lg py-3">
-                      Proceed to Checkout
+                    <Button 
+                      className="w-full bg-orange-600 hover:bg-orange-700 text-lg py-3"
+                      onClick={handleCheckout}
+                      disabled={submitting}
+                    >
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Placing Order...
+                        </>
+                      ) : (
+                        'Place Order'
+                      )}
                     </Button>
                   </div>
                 </>
