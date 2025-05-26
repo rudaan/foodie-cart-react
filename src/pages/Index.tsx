@@ -190,8 +190,8 @@ const Index = () => {
 
         {/* Cart Sidebar */}
         {isCartOpen && (
-          <div className="fixed right-0 top-16 h-full w-96 bg-white shadow-xl border-l z-30 overflow-y-auto">
-            <div className="p-6">
+          <div className="fixed right-0 top-16 h-[calc(100vh-4rem)] w-96 bg-white shadow-xl border-l z-30 flex flex-col">
+            <div className="flex-1 overflow-y-auto p-6">
               <h3 className="text-2xl font-bold mb-6">Your Order</h3>
               
               {cartItems.length === 0 ? (
@@ -245,32 +245,35 @@ const Index = () => {
                     menuItems={menuItems} 
                     onAddToCart={addToCart}
                   />
-
-                  <div className="border-t pt-6 mt-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <span className="text-xl font-semibold">Total:</span>
-                      <span className="text-2xl font-bold text-orange-600">
-                        ${getTotalPrice().toFixed(2)}
-                      </span>
-                    </div>
-                    <Button 
-                      className="w-full bg-orange-600 hover:bg-orange-700 text-lg py-3"
-                      onClick={handleCheckout}
-                      disabled={submitting}
-                    >
-                      {submitting ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Placing Order...
-                        </>
-                      ) : (
-                        'Place Order'
-                      )}
-                    </Button>
-                  </div>
                 </>
               )}
             </div>
+
+            {/* Fixed checkout section at bottom */}
+            {cartItems.length > 0 && (
+              <div className="border-t bg-white p-6">
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xl font-semibold">Total:</span>
+                  <span className="text-2xl font-bold text-orange-600">
+                    ${getTotalPrice().toFixed(2)}
+                  </span>
+                </div>
+                <Button 
+                  className="w-full bg-orange-600 hover:bg-orange-700 text-lg py-3"
+                  onClick={handleCheckout}
+                  disabled={submitting}
+                >
+                  {submitting ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Placing Order...
+                    </>
+                  ) : (
+                    'Place Order'
+                  )}
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
