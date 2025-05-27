@@ -200,6 +200,7 @@ const Index = () => {
                   <RecommendedItems 
                     menuItems={menuItems} 
                     onAddToCart={addToCart}
+                    cartItems={cartItems}
                   />
                 </div>
               ) : (
@@ -244,6 +245,7 @@ const Index = () => {
                   <RecommendedItems 
                     menuItems={menuItems} 
                     onAddToCart={addToCart}
+                    cartItems={cartItems}
                   />
                 </>
               )}

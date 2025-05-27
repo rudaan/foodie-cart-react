@@ -8,12 +8,16 @@ import { MenuItem } from '@/hooks/useMenuItems';
 interface RecommendedItemsProps {
   menuItems: MenuItem[];
   onAddToCart: (item: MenuItem) => void;
+  cartItems?: { id: string; quantity: number }[];
 }
 
-const RecommendedItems = ({ menuItems, onAddToCart }: RecommendedItemsProps) => {
-  // Get 3 random recommended items
+const RecommendedItems = ({ menuItems, onAddToCart, cartItems = [] }: RecommendedItemsProps) => {
+  // Get cart item IDs for filtering
+  const cartItemIds = cartItems.map(item => item.id);
+  
+  // Get 3 random recommended items that are not in the cart
   const recommendedItems = menuItems
-    .filter(item => item.rating >= 4.5)
+    .filter(item => item.rating >= 4.5 && !cartItemIds.includes(item.id))
     .slice(0, 3);
 
   if (recommendedItems.length === 0) {
