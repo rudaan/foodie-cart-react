@@ -139,14 +139,14 @@ const Index = () => {
                   <Button onClick={() => window.location.reload()}>Retry</Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                   {menuItems.map(item => (
-                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
                       <div className="relative">
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="w-full h-48 object-cover"
+                          className="w-full h-40 sm:h-48 object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop';
@@ -156,27 +156,29 @@ const Index = () => {
                           {item.category}
                         </Badge>
                       </div>
-                      <CardContent className="p-6">
+                      <CardContent className="p-4 sm:p-6 flex-1 flex flex-col">
                         <div className="flex items-center mb-2">
-                          <h4 className="text-xl font-semibold text-gray-900 flex-1">
+                          <h4 className="text-lg sm:text-xl font-semibold text-gray-900 flex-1 truncate">
                             {item.name}
                           </h4>
-                          <div className="flex items-center">
+                          <div className="flex items-center ml-2">
                             <Star className="w-4 h-4 text-yellow-400 fill-current" />
                             <span className="text-sm text-gray-600 ml-1">{item.rating}</span>
                           </div>
                         </div>
-                        <p className="text-gray-600 mb-4">{item.description}</p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold text-orange-600">
+                        <p className="text-gray-600 mb-4 text-sm sm:text-base line-clamp-2 flex-1">{item.description}</p>
+                        <div className="flex items-center justify-between mt-auto">
+                          <span className="text-xl sm:text-2xl font-bold text-orange-600">
                             ${item.price.toFixed(2)}
                           </span>
                           <Button
                             onClick={() => addToCart(item)}
-                            className="bg-orange-600 hover:bg-orange-700"
+                            className="bg-orange-600 hover:bg-orange-700 text-sm sm:text-base"
+                            size="sm"
                           >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Add to Cart
+                            <Plus className="w-4 h-4 mr-1 sm:mr-2" />
+                            <span className="hidden sm:inline">Add to Cart</span>
+                            <span className="sm:hidden">Add</span>
                           </Button>
                         </div>
                       </CardContent>
