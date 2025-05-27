@@ -76,13 +76,13 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-orange-50 to-red-50">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <header className="bg-white shadow-sm border-b sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent">
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-red-600 to-red-700 bg-clip-text text-transparent">
                 FoodieDelight
               </h1>
             </div>
@@ -107,31 +107,28 @@ const Index = () => {
         {/* Main Content */}
         <main className={`flex-1 transition-all duration-300 ${isCartOpen ? 'mr-96' : ''}`}>
           {/* Hero Section */}
-          <section className="bg-gradient-to-r from-orange-600 to-red-600 text-white py-16">
+          <section className="bg-gradient-to-r from-red-600 to-red-700 text-white py-12">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-              <h2 className="text-4xl md:text-6xl font-bold mb-4">
-                Delicious Food, Delivered Fast
+              <h2 className="text-3xl md:text-5xl font-bold mb-4">
+                Discover great places to eat
               </h2>
-              <p className="text-xl md:text-2xl mb-8 opacity-90">
-                Order your favorite meals from the comfort of your home
+              <p className="text-lg md:text-xl mb-6 opacity-90">
+                Order food from your favorite restaurants
               </p>
-              <Button size="lg" className="bg-white text-orange-600 hover:bg-gray-100">
-                Browse Menu
-              </Button>
             </div>
           </section>
 
           {/* Menu Section */}
-          <section className="py-16">
+          <section className="py-8">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-              <h3 className="text-3xl font-bold text-gray-900 mb-8 text-center">
-                Our Menu
+              <h3 className="text-2xl font-bold text-gray-900 mb-6">
+                Restaurants near you
               </h3>
               
               {loading ? (
                 <div className="flex justify-center items-center py-12">
-                  <Loader2 className="w-8 h-8 animate-spin text-orange-600" />
-                  <span className="ml-2 text-gray-600">Loading menu items...</span>
+                  <Loader2 className="w-8 h-8 animate-spin text-red-600" />
+                  <span className="ml-2 text-gray-600">Loading restaurants...</span>
                 </div>
               ) : error ? (
                 <div className="text-center py-12">
@@ -139,46 +136,53 @@ const Index = () => {
                   <Button onClick={() => window.location.reload()}>Retry</Button>
                 </div>
               ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {menuItems.map(item => (
-                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-shadow duration-300 flex flex-col">
+                    <Card key={item.id} className="overflow-hidden hover:shadow-lg transition-all duration-300 border-0 shadow-sm bg-white">
                       <div className="relative">
                         <img
                           src={item.image}
                           alt={item.name}
-                          className="w-full h-40 sm:h-48 object-cover"
+                          className="w-full h-36 object-cover"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
                             target.src = 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=400&h=300&fit=crop';
                           }}
                         />
-                        <Badge className="absolute top-2 left-2 bg-orange-500">
-                          {item.category}
-                        </Badge>
+                        <div className="absolute top-2 left-2">
+                          <Badge className="bg-white text-gray-700 text-xs font-medium border-0 shadow-sm">
+                            {item.category}
+                          </Badge>
+                        </div>
+                        <div className="absolute top-2 right-2 bg-green-600 text-white px-2 py-1 rounded text-xs font-semibold flex items-center">
+                          {item.rating}
+                          <Star className="w-3 h-3 ml-1 fill-current" />
+                        </div>
                       </div>
-                      <CardContent className="p-4 sm:p-6 flex-1 flex flex-col">
-                        <div className="flex items-center mb-2">
-                          <h4 className="text-lg sm:text-xl font-semibold text-gray-900 flex-1 truncate">
+                      <CardContent className="p-3">
+                        <div className="mb-2">
+                          <h4 className="text-lg font-semibold text-gray-900 truncate mb-1">
                             {item.name}
                           </h4>
-                          <div className="flex items-center ml-2">
-                            <Star className="w-4 h-4 text-yellow-400 fill-current" />
-                            <span className="text-sm text-gray-600 ml-1">{item.rating}</span>
-                          </div>
+                          <p className="text-gray-500 text-sm line-clamp-2 mb-3" style={{ height: '2.5rem' }}>
+                            {item.description}
+                          </p>
                         </div>
-                        <p className="text-gray-600 mb-4 text-sm sm:text-base line-clamp-2 flex-1">{item.description}</p>
-                        <div className="flex items-center justify-between mt-auto">
-                          <span className="text-xl sm:text-2xl font-bold text-orange-600">
-                            ${item.price.toFixed(2)}
-                          </span>
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col">
+                            <span className="text-lg font-bold text-gray-900">
+                              ₹{(item.price * 80).toFixed(0)}
+                            </span>
+                            <span className="text-xs text-gray-500">
+                              ${item.price.toFixed(2)}
+                            </span>
+                          </div>
                           <Button
                             onClick={() => addToCart(item)}
-                            className="bg-orange-600 hover:bg-orange-700 text-sm sm:text-base"
+                            className="bg-red-600 hover:bg-red-700 text-white border-0 px-4 py-2 text-sm font-medium"
                             size="sm"
                           >
-                            <Plus className="w-4 h-4 mr-1 sm:mr-2" />
-                            <span className="hidden sm:inline">Add to Cart</span>
-                            <span className="sm:hidden">Add</span>
+                            ADD
                           </Button>
                         </div>
                       </CardContent>
@@ -221,7 +225,7 @@ const Index = () => {
                         />
                         <div className="flex-1">
                           <h4 className="font-semibold">{item.name}</h4>
-                          <p className="text-orange-600 font-medium">${item.price.toFixed(2)}</p>
+                          <p className="text-red-600 font-medium">${item.price.toFixed(2)}</p>
                         </div>
                         <div className="flex items-center space-x-2">
                           <Button
@@ -258,12 +262,12 @@ const Index = () => {
               <div className="border-t bg-white p-6">
                 <div className="flex justify-between items-center mb-4">
                   <span className="text-xl font-semibold">Total:</span>
-                  <span className="text-2xl font-bold text-orange-600">
+                  <span className="text-2xl font-bold text-red-600">
                     ${getTotalPrice().toFixed(2)}
                   </span>
                 </div>
                 <Button 
-                  className="w-full bg-orange-600 hover:bg-orange-700 text-lg py-3"
+                  className="w-full bg-red-600 hover:bg-red-700 text-lg py-3"
                   onClick={handleCheckout}
                   disabled={submitting}
                 >
